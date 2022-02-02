@@ -8,7 +8,7 @@ jobs:
     name: Publish - Docker Hub
     runs-on: ubuntu-latest
     env:
-      REPO: thundraio/sidekick-demo-todo-app-java
+      REPO: runsidekick/sidekick-demo-todo-app-java
 
     steps:
       - uses: actions/checkout@v2
@@ -21,7 +21,7 @@ jobs:
       - name: Create artifact
         run: mvn -B clean package -DskipTests
       - name: Login to Docker Hub
-        run: docker login -u thundraio -p ${{ secrets.THUNDRA_DOCKERHUB_PASSWORD }}
+        run: docker login -u runsidekick -p ${{ secrets.SIDEKICK_DOCKERHUB_PASSWORD }}
       - name: Build Docker image
         run: docker build -t $REPO:latest -t $REPO:${GITHUB_SHA::8} .
       - name: Publish Docker image
