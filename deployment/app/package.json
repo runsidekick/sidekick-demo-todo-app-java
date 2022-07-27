@@ -1,5 +1,5 @@
 {
-  "name": "sidekick-api-deploy-app",
+  "name": "sidekick-sandbox-todo-java-deploy-app",
   "version": "0.1.0",
   "bin": {
     "app": "bin/app.js"
@@ -7,7 +7,7 @@
   "private": true,
   "repository": {
     "type": "git",
-    "url": "git://github.com/runsidekick/sidekick.git"
+    "url": "git://github.com/runsidekick/sidekick-demo-todo-app-java.git"
   },
   "scripts": {
     "build": "tsc",
