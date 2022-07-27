@@ -41,10 +41,10 @@ export class SetupStack extends cdk.NestedStack {
   async create() {
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-    // Get Sidekick Sandbox VPC
+    // Get Sidekick VPC
 
-    this.sidekickSandboxTodoJavaVPC = ec2.Vpc.fromLookup(this, `lookup-sidekick-sandbox-vpc-${process.env.STAGE}`, {
-      vpcName: `sidekick-sandbox-vpc-${process.env.STAGE}`,
+    this.sidekickSandboxTodoJavaVPC = ec2.Vpc.fromLookup(this, `lookup-sidekick-vpc-${process.env.STAGE}`, {
+      vpcName: `sidekick-vpc-${process.env.STAGE}`,
     });
 
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
