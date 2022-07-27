@@ -96,40 +96,11 @@ export class SetupStack extends cdk.NestedStack {
         new iam.PolicyStatement({
           effect: iam.Effect.ALLOW,
           actions: [
-            'ssm:Get*',
-            'ssm:List*',
-          ],
-          resources: [
-            `arn:aws:ssm:*:*:parameter/sidekick/${process.env.STAGE}/*`
-          ],
-        }),
-        new iam.PolicyStatement({
-          effect: iam.Effect.ALLOW,
-          actions: [
-            "secretsmanager:GetSecretValue",
-            "secretsmanager:DescribeSecret",
-          ],
-          resources: [
-            `arn:aws:secretsmanager:*:*:secret:sidekick/${process.env.STAGE}/*`
-          ],
-        }),
-        new iam.PolicyStatement({
-          effect: iam.Effect.ALLOW,
-          actions: [
             'logs:CreateLogStream',
             'logs:PutLogEvents',
           ],
           resources: [
             `arn:aws:logs:*:*:log-group:/aws/elasticbeanstalk/sidekick-sandbox-todo-java-${process.env.STAGE}*`,
-          ],
-        }),
-        new iam.PolicyStatement({
-          effect: iam.Effect.ALLOW,
-          actions: [
-            'sns:Publish',
-          ],
-          resources: [
-            `arn:aws:sns:*:*:sidekick-notification-topic-${process.env.STAGE}`,
           ],
         }),
       ],
