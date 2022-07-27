@@ -10,7 +10,7 @@ then
   exit 1
 fi
 
-pushd ../../
+pushd ../
 
 echo "Building project ..."
 mvn clean install -DskipTests -Dcheckstyle.skip=true
