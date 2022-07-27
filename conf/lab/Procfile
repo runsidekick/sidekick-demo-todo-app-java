@@ -1,0 +1,1 @@
+web: java -jar -Xms768m -Xmx768m -javaagent:sidekick-agent-bootstrap.jar -Dsidekick.agent.application.name=sidekick-demo-todo-app-java -Dsidekick.agent.application.version=1.0.0 -Dsidekick.agent.application.stage=onboarding -Dsidekick.agent.broker.host=wss://broker.service.runsidekick.com sidekick-demo-todo-app-java.jar
