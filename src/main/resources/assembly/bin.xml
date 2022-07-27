@@ -13,7 +13,7 @@
             <includes>
                 <include>Procfile</include>
                 <include>Buildfile</include>
-                <include>.ebextensions/**</include>
+                
             </includes>
         </fileSet>
         <fileSet>
