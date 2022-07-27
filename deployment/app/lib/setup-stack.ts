@@ -20,6 +20,7 @@ export class SetupStack extends cdk.NestedStack {
 
   sidekickSandboxTodoJavaSecurityGroupName: string;
   sidekickSandboxTodoJavaSecurityGroup: ec2.SecurityGroup;
+  sidekickServiceELBSecurityGroupId: string;
 
   sidekickSandboxTodoJavaRoleName: string;
   sidekickSandboxTodoJavaRole: iam.Role;
@@ -56,6 +57,16 @@ export class SetupStack extends cdk.NestedStack {
       description: `Sidekick Sandbox Todo Java Security Group for ${process.env.STAGE} environment`,
       vpc: this.sidekickSandboxTodoJavaVPC,
       allowAllOutbound: true,
+    });
+
+    this.sidekickServiceELBSecurityGroupId = cdk.Fn.importValue(`sidekick-service-elb-sg-id-${process.env.STAGE}`);
+
+    const sidekickServiceELBSecurityGroup = ec2.SecurityGroup.fromSecurityGroupId(this, `lookup-sidekick-service-elb-sg-${process.env.STAGE}`, this.sidekickServiceELBSecurityGroupId);
+
+    this.sidekickSandboxTodoJavaSecurityGroup.connections.allowFrom(sidekickServiceELBSecurityGroup, ec2.Port.tcp(8080), 'Ingress HTTP connection from ELB');
+    new cdk.CfnOutput(this, `sidekick-api-sg-id-${process.env.STAGE}`, {
+      value: this.sidekickSandboxTodoJavaSecurityGroup.securityGroupId,
+      exportName: `sidekick-api-sg-id-${process.env.STAGE}`,
     });
 
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
