@@ -40,7 +40,7 @@ export ARTIFACT_S3_BUCKET=sidekick-releases-${STAGE}
 export ARTIFACT_S3_KEY=sidekick-demo-todo-app-java/${ARTIFACT_NAME}
 export ARTIFACT_S3_PATH=s3://${ARTIFACT_S3_BUCKET}/${ARTIFACT_S3_KEY}
 echo "Uploading built artifact to ${ARTIFACT_S3_PATH} ..."
-aws s3 cp target/sidekick-demo-todo-app-java.zip "${ARTIFACT_S3_PATH}"
+aws s3 cp target/sidekick-demo-todo-app-java-${ARTIFACT_VERSION}.zip "${ARTIFACT_S3_PATH}"
 
 popd
 
