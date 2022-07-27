@@ -97,12 +97,12 @@
   {
     "namespace": "aws:elasticbeanstalk:environment:process:default",
     "optionName": "Port",
-    "value": "8084"
+    "value": "8080"
   },
   {
     "namespace": "aws:elasticbeanstalk:environment:process:default",
     "optionName": "HealthCheckPath",
-    "value": "/ping"
+    "value": "/"
   },
   {
     "namespace": "aws:elasticbeanstalk:environment:process:default",
