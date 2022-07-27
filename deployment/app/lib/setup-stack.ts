@@ -103,6 +103,16 @@ export class SetupStack extends cdk.NestedStack {
             `arn:aws:logs:*:*:log-group:/aws/elasticbeanstalk/sidekick-sandbox-todo-java-${process.env.STAGE}*`,
           ],
         }),
+        new iam.PolicyStatement({
+          effect: iam.Effect.ALLOW,
+          actions: [
+            's3:Get*',
+            's3:List*',
+          ],
+          resources: [
+            `arn:aws:s3:::sidekick-releases-${process.env.STAGE}/agents/*`
+          ],
+        }),
       ],
     });
     new cdk.CfnOutput(this, `sidekick-sandbox-todo-java-role-arn-${process.env.STAGE}`, {
