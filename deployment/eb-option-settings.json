@@ -2,17 +2,17 @@
   {
     "namespace": "aws:ec2:vpc",
     "optionName": "VPCId",
-    "value": "${sidekickSandboxTodoJavaVPCId}"
+    "value": "${sidekickVPCId}"
   },
   {
     "namespace": "aws:ec2:vpc",
     "optionName": "ELBSubnets",
-    "value": "${sidekickSandboxTodoJavaVPCPublicSubnets}"
+    "value": "${sidekickVPCPublicSubnets}"
   },
   {
     "namespace": "aws:ec2:vpc",
     "optionName": "Subnets",
-    "value": "${sidekickSandboxTodoJavaVPCPrivateSubnets}"
+    "value": "${sidekickVPCPrivateSubnets}"
   },
   {
     "namespace": "aws:autoscaling:asg",

@@ -2,6 +2,7 @@ import * as cdk from 'aws-cdk-lib';
 import * as ec2 from 'aws-cdk-lib/aws-ec2';
 import * as iam from 'aws-cdk-lib/aws-iam';
 import * as eb from 'aws-cdk-lib/aws-elasticbeanstalk';
+import * as route53 from 'aws-cdk-lib/aws-route53';
 import {
   ApplicationDescription,
 } from "aws-sdk/clients/elasticbeanstalk";
@@ -17,6 +18,8 @@ export class SetupStack extends cdk.NestedStack {
   logicalStackName: string;
 
   sidekickVPC: ec2.IVpc;
+
+  sidekickSandboxZone: route53.HostedZone;
 
   sidekickSandboxTodoJavaSecurityGroupName: string;
   sidekickSandboxTodoJavaSecurityGroup: ec2.SecurityGroup;
@@ -45,6 +48,14 @@ export class SetupStack extends cdk.NestedStack {
 
     this.sidekickVPC = ec2.Vpc.fromLookup(this, `lookup-sidekick-vpc-${process.env.STAGE}`, {
       vpcName: `sidekick-vpc-${process.env.STAGE}`,
+    });
+
+    ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+    // Get Sidekick Zone
+
+    this.sidekickSandboxZone = route53.HostedZone.fromLookup(this,`sidekick-sandbox-zone-${process.env.STAGE}`, {
+      domainName: `${process.env.DOMAIN_NAME}`
     });
 
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////

@@ -2,6 +2,8 @@ import * as cdk from 'aws-cdk-lib';
 import * as eb from 'aws-cdk-lib/aws-elasticbeanstalk';
 import * as ec2 from 'aws-cdk-lib/aws-ec2';
 import * as elbv2 from 'aws-cdk-lib/aws-elasticloadbalancingv2';
+import * as route53 from 'aws-cdk-lib/aws-route53';
+import * as alias from 'aws-cdk-lib/aws-route53-targets';
 import { SetupStack } from './setup-stack';
 import { Construct } from 'constructs';
 
@@ -98,6 +100,17 @@ export class DeployStack extends cdk.NestedStack {
     new cdk.CfnOutput(this, `sidekick-sandbox-todo-java-eb-environment-name-${process.env.STAGE}`, {
       value: setupStack.sidekickSandboxTodoJavaEBEnvironmentName,
       exportName: `sidekick-sandbox-todo-java-eb-environment-name-${process.env.STAGE}`,
+    });
+
+
+    ////////////////////////////////////////////////////////////////////////////////////////////////////
+    //
+    // Route53 A Record Redirect
+    //
+    new route53.ARecord(this,`sidekick-sandbox-elb-dns-a-record-${process.env.STAGE}`, {
+      zone: setupStack.sidekickSandboxZone,
+      recordName: `*.${process.env.SANDBOX_SUBDOMAIN_NAME}`,
+      target: route53.RecordTarget.fromAlias(new alias.LoadBalancerTarget(sidekickSandboxELB))
     });
   }
 }
