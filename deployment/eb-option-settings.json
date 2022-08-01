@@ -52,17 +52,17 @@
   {
     "namespace": "aws:elbv2:loadbalancer",
     "optionName": "SharedLoadBalancer",
-    "value": "${sidekickServiceELB.loadBalancerArn}"
+    "value": "${sidekickSandboxELB.loadBalancerArn}"
   },
   {
     "namespace": "aws:elbv2:loadbalancer",
     "optionName": "ManagedSecurityGroup",
-    "value": "${sidekickServiceELBSecurityGroupId}"
+    "value": "${sidekickSandboxELBSecurityGroupId}"
   },
   {
     "namespace": "aws:elbv2:loadbalancer",
     "optionName": "SecurityGroups",
-    "value": "${sidekickServiceELBSecurityGroupId}"
+    "value": "${sidekickSandboxELBSecurityGroupId}"
   },
   {
     "namespace": "aws:elbv2:listener:443",
