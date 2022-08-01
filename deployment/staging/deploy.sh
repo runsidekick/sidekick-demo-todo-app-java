@@ -2,7 +2,7 @@
 set -x
 set -e
 
-export PROFILE=lab
+export PROFILE=staging
 
 pushd ../
 
