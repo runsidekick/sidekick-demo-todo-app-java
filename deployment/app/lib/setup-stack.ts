@@ -19,7 +19,7 @@ export class SetupStack extends cdk.NestedStack {
 
   sidekickVPC: ec2.IVpc;
 
-  sidekickSandboxZone: route53.HostedZone;
+  sidekickZone: route53.HostedZone;
 
   sidekickSandboxTodoJavaSecurityGroupName: string;
   sidekickSandboxTodoJavaSecurityGroup: ec2.SecurityGroup;
@@ -54,7 +54,7 @@ export class SetupStack extends cdk.NestedStack {
 
     // Get Sidekick Zone
 
-    this.sidekickSandboxZone = route53.HostedZone.fromLookup(this,`sidekick-sandbox-zone-${process.env.STAGE}`, {
+    this.sidekickZone = route53.HostedZone.fromLookup(this,`sidekick-zone-${process.env.STAGE}`, {
       domainName: `${process.env.DOMAIN_NAME}`
     });
 

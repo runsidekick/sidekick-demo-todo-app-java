@@ -108,7 +108,7 @@ export class DeployStack extends cdk.NestedStack {
     // Route53 A Record Redirect
     //
     new route53.ARecord(this,`sidekick-sandbox-elb-dns-a-record-${process.env.STAGE}`, {
-      zone: setupStack.sidekickSandboxZone,
+      zone: setupStack.sidekickZone,
       recordName: `*.${process.env.SANDBOX_SUBDOMAIN_NAME}`,
       target: route53.RecordTarget.fromAlias(new alias.LoadBalancerTarget(sidekickSandboxELB))
     });
