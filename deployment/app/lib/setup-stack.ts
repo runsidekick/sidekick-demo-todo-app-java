@@ -19,7 +19,7 @@ export class SetupStack extends cdk.NestedStack {
 
   sidekickVPC: ec2.IVpc;
 
-  sidekickZone: route53.HostedZone;
+  sidekickZone: route53.IHostedZone;
 
   sidekickSandboxTodoJavaSecurityGroupName: string;
   sidekickSandboxTodoJavaSecurityGroup: ec2.SecurityGroup;
