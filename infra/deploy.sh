@@ -14,6 +14,6 @@ pushd app/
 
 npm install
 cdk bootstrap --no-color
-cdk deploy ${STACK_NAME}-${STAGE} --require-approval never --no-color
+cdk deploy sidekick-sandbox-setup-stack-${STAGE} --require-approval never --no-color
 
 popd
