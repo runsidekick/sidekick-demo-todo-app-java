@@ -13,7 +13,7 @@ export class DeployStack extends cdk.NestedStack {
   sidekickSandboxTodoJavaEBConfigurationTemplate: eb.CfnConfigurationTemplate;
   sidekickSandboxTodoJavaEBEnvironment: eb.CfnEnvironment;
 
-  sidekickServiceELBArn: string
+  sidekickSandboxELBArn: string
 
   constructor(scope: Construct, id: string, setupStack: SetupStack, props?: cdk.NestedStackProps) {
     super(scope, id, props);
@@ -43,21 +43,21 @@ export class DeployStack extends cdk.NestedStack {
     // Create Sidekick Sandbox Todo Java EB Configuration Template
 
     // Get properties from setup stack as local variable to be able to bind them into loaded option settings
-    const sidekickSandboxTodoJavaVPCId = setupStack.sidekickSandboxTodoJavaVPC.vpcId;
-    const sidekickSandboxTodoJavaVPCPublicSubnets = setupStack.sidekickSandboxTodoJavaVPC.publicSubnets.map((value: any) => value.subnetId).join(',');
-    const sidekickSandboxTodoJavaVPCPrivateSubnets = setupStack.sidekickSandboxTodoJavaVPC.privateSubnets.map((value: any) => value.subnetId).join(',');
+    const sidekickVPCId = setupStack.sidekickVPC.vpcId;
+    const sidekickVPCPublicSubnets = setupStack.sidekickVPC.publicSubnets.map((value: any) => value.subnetId).join(',');
+    const sidekickVPCPrivateSubnets = setupStack.sidekickVPC.privateSubnets.map((value: any) => value.subnetId).join(',');
     const sidekickSandboxTodoJavaInstanceProfileName = setupStack.sidekickSandboxTodoJavaInstanceProfileName;
     const sidekickSandboxTodoJavaSecurityGroupId = setupStack.sidekickSandboxTodoJavaSecurityGroup.securityGroupId;
-    const sidekickServiceELBSecurityGroupId = setupStack.sidekickServiceELBSecurityGroupId;
+    const sidekickSandboxELBSecurityGroupId = setupStack.sidekickSandboxELBSecurityGroupId;
 
-    this.sidekickServiceELBArn = cdk.Fn.importValue(`sidekick-service-elb-arn-${process.env.STAGE}`);
+    this.sidekickSandboxELBArn = cdk.Fn.importValue(`sidekick-sandbox-elb-arn-${process.env.STAGE}`);
 
-    const sidekickServiceELB: elbv2.IApplicationLoadBalancer = elbv2.ApplicationLoadBalancer.fromApplicationLoadBalancerAttributes(this,
-      `lookup-sidekick-service-elb-${process.env.STAGE}`,
+    const sidekickSandboxELB: elbv2.IApplicationLoadBalancer = elbv2.ApplicationLoadBalancer.fromApplicationLoadBalancerAttributes(this,
+      `lookup-sidekick-sandbox-elb-${process.env.STAGE}`,
       {
-        loadBalancerArn: this.sidekickServiceELBArn.toString(),
-        securityGroupId: sidekickServiceELBSecurityGroupId,
-        vpc: setupStack.sidekickSandboxTodoJavaVPC
+        loadBalancerArn: this.sidekickSandboxELBArn.toString(),
+        securityGroupId: sidekickSandboxELBSecurityGroupId,
+        vpc: setupStack.sidekickVPC
       }
     );
 
@@ -73,7 +73,7 @@ export class DeployStack extends cdk.NestedStack {
 
     this.sidekickSandboxTodoJavaEBConfigurationTemplate.node.addDependency(setupStack.sidekickSandboxTodoJavaInstanceProfile);
     this.sidekickSandboxTodoJavaEBConfigurationTemplate.node.addDependency(setupStack.sidekickSandboxTodoJavaSecurityGroup);
-    this.sidekickSandboxTodoJavaEBConfigurationTemplate.node.addDependency(sidekickServiceELB);
+    this.sidekickSandboxTodoJavaEBConfigurationTemplate.node.addDependency(sidekickSandboxELB);
 
     new cdk.CfnOutput(this, `sidekick-sandbox-todo-java-eb-config-template-name-${process.env.STAGE}`, {
       value: this.sidekickSandboxTodoJavaEBConfigurationTemplate.ref,

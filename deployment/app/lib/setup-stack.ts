@@ -16,11 +16,11 @@ export class SetupStack extends cdk.NestedStack {
 
   logicalStackName: string;
 
-  sidekickSandboxTodoJavaVPC: ec2.IVpc;
+  sidekickVPC: ec2.IVpc;
 
   sidekickSandboxTodoJavaSecurityGroupName: string;
   sidekickSandboxTodoJavaSecurityGroup: ec2.SecurityGroup;
-  sidekickServiceELBSecurityGroupId: string;
+  sidekickSandboxELBSecurityGroupId: string;
 
   sidekickSandboxTodoJavaRoleName: string;
   sidekickSandboxTodoJavaRole: iam.Role;
@@ -43,7 +43,7 @@ export class SetupStack extends cdk.NestedStack {
 
     // Get Sidekick VPC
 
-    this.sidekickSandboxTodoJavaVPC = ec2.Vpc.fromLookup(this, `lookup-sidekick-vpc-${process.env.STAGE}`, {
+    this.sidekickVPC = ec2.Vpc.fromLookup(this, `lookup-sidekick-vpc-${process.env.STAGE}`, {
       vpcName: `sidekick-vpc-${process.env.STAGE}`,
     });
 
@@ -55,15 +55,15 @@ export class SetupStack extends cdk.NestedStack {
     this.sidekickSandboxTodoJavaSecurityGroup = new ec2.SecurityGroup(this, this.sidekickSandboxTodoJavaSecurityGroupName, {
       securityGroupName: this.sidekickSandboxTodoJavaSecurityGroupName,
       description: `Sidekick Sandbox Todo Java Security Group for ${process.env.STAGE} environment`,
-      vpc: this.sidekickSandboxTodoJavaVPC,
+      vpc: this.sidekickVPC,
       allowAllOutbound: true,
     });
 
-    this.sidekickServiceELBSecurityGroupId = cdk.Fn.importValue(`sidekick-service-elb-sg-id-${process.env.STAGE}`);
+    this.sidekickSandboxELBSecurityGroupId = cdk.Fn.importValue(`sidekick-sandbox-elb-sg-id-${process.env.STAGE}`);
 
-    const sidekickServiceELBSecurityGroup = ec2.SecurityGroup.fromSecurityGroupId(this, `lookup-sidekick-service-elb-sg-${process.env.STAGE}`, this.sidekickServiceELBSecurityGroupId);
+    const sidekickSandboxELBSecurityGroup = ec2.SecurityGroup.fromSecurityGroupId(this, `lookup-sidekick-sandbox-elb-sg-${process.env.STAGE}`, this.sidekickSandboxELBSecurityGroupId);
 
-    this.sidekickSandboxTodoJavaSecurityGroup.connections.allowFrom(sidekickServiceELBSecurityGroup, ec2.Port.tcp(8080), 'Ingress HTTP connection from ELB');
+    this.sidekickSandboxTodoJavaSecurityGroup.connections.allowFrom(sidekickSandboxELBSecurityGroup, ec2.Port.tcp(8080), 'Ingress HTTP connection from ELB');
     new cdk.CfnOutput(this, `sidekick-sandbox-todo-java-sg-id-${process.env.STAGE}`, {
       value: this.sidekickSandboxTodoJavaSecurityGroup.securityGroupId,
       exportName: `sidekick-sandbox-todo-java-sg-id-${process.env.STAGE}`,
