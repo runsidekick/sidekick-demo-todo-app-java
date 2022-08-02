@@ -16,7 +16,7 @@ export class SetupStack extends cdk.NestedStack {
 
   logicalStackName: string;
 
-  defaultVPC: ec2.IVpc;
+  sidekickVPC: ec2.IVpc;
 
   sidekickSandboxSecurityGroupName: string;
   sidekickSandboxSecurityGroup: ec2.SecurityGroup;
@@ -42,8 +42,8 @@ export class SetupStack extends cdk.NestedStack {
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
     // Get Sidekick VPC
-    this.defaultVPC = ec2.Vpc.fromLookup(this, `lookup-default-vpc-${process.env.STAGE}`, {
-      isDefault: true
+    this.sidekickVPC = ec2.Vpc.fromLookup(this, `lookup-sidekick-vpc-${process.env.STAGE}`, {
+      vpcName: `sidekick-vpc-${process.env.STAGE}`,
     });
 
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -54,7 +54,7 @@ export class SetupStack extends cdk.NestedStack {
     this.sidekickSandboxSecurityGroup = new ec2.SecurityGroup(this, this.sidekickSandboxSecurityGroupName, {
       securityGroupName: this.sidekickSandboxSecurityGroupName,
       description: `Sidekick Sandbox Security Group for ${process.env.STAGE} environment`,
-      vpc: this.defaultVPC,
+      vpc: this.sidekickVPC,
       allowAllOutbound: true,
     });
 
