@@ -6,10 +6,6 @@ import * as acm from 'aws-cdk-lib/aws-certificatemanager';
 import * as elbv2 from 'aws-cdk-lib/aws-elasticloadbalancingv2';
 import { Construct } from 'constructs';
 
-interface ELBStackProps extends cdk.NestedStackProps {
-  vpc: ec2.IVpc
-}
-
 export class SandboxELBStack extends cdk.NestedStack {
 
   defaultVPC: ec2.IVpc;
@@ -22,7 +18,7 @@ export class SandboxELBStack extends cdk.NestedStack {
 
   sidekickSandboxELBSecurityGroup: ec2.SecurityGroup;
 
-  constructor(scope: Construct, id: string, props: ELBStackProps) {
+  constructor(scope: Construct, id: string, props: cdk.NestedStackProps) {
     super(scope, id, props);
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////
