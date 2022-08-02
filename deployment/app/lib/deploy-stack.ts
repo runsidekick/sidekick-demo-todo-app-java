@@ -46,13 +46,13 @@ export class DeployStack extends cdk.NestedStack {
         this,
         `lookup-sidekick-db-access-marker-sg-${process.env.STAGE}`,
         `sidekick-db-access-marker-sg-${process.env.STAGE}`,
-        setupStack.sidekickSandboxVPC);
+        setupStack.sidekickVPC);
 
     this.sidekickCacheAccessMarkerSecurityGroup = ec2.SecurityGroup.fromLookupByName(
         this,
         `lookup-sidekick-cache-access-marker-sg-${process.env.STAGE}`,
         `sidekick-cache-access-marker-sg-${process.env.STAGE}`,
-        setupStack.sidekickSandboxVPC);
+        setupStack.sidekickVPC);
 
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
