@@ -2,7 +2,6 @@ import * as cdk from 'aws-cdk-lib';
 import * as ec2 from 'aws-cdk-lib/aws-ec2';
 import * as iam from 'aws-cdk-lib/aws-iam';
 import * as eb from 'aws-cdk-lib/aws-elasticbeanstalk';
-import * as route53 from 'aws-cdk-lib/aws-route53';
 import {
   ApplicationDescription,
 } from "aws-sdk/clients/elasticbeanstalk";
@@ -17,20 +16,18 @@ export class SetupStack extends cdk.NestedStack {
 
   logicalStackName: string;
 
-  sidekickVPC: ec2.IVpc;
+  defaultVPC: ec2.IVpc;
 
-  sidekickZone: route53.IHostedZone;
-
-  sidekickSandboxTodoJavaSecurityGroupName: string;
-  sidekickSandboxTodoJavaSecurityGroup: ec2.SecurityGroup;
+  sidekickSandboxSecurityGroupName: string;
+  sidekickSandboxSecurityGroup: ec2.SecurityGroup;
   sidekickSandboxELBSecurityGroupId: string;
 
-  sidekickSandboxTodoJavaRoleName: string;
-  sidekickSandboxTodoJavaRole: iam.Role;
-  sidekickSandboxTodoJavaPolicyName: string;
-  sidekickSandboxTodoJavaPolicy: iam.ManagedPolicy;
-  sidekickSandboxTodoJavaInstanceProfileName: string;
-  sidekickSandboxTodoJavaInstanceProfile: iam.CfnInstanceProfile;
+  sidekickSandboxRoleName: string;
+  sidekickSandboxRole: iam.Role;
+  sidekickSandboxPolicyName: string;
+  sidekickSandboxPolicy: iam.ManagedPolicy;
+  sidekickSandboxInstanceProfileName: string;
+  sidekickSandboxInstanceProfile: iam.CfnInstanceProfile;
 
   sidekickSandboxTodoJavaEBAppName: string;
   sidekickSandboxTodoJavaEBApp: eb.CfnApplication;
@@ -45,28 +42,19 @@ export class SetupStack extends cdk.NestedStack {
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
     // Get Sidekick VPC
-
-    this.sidekickVPC = ec2.Vpc.fromLookup(this, `lookup-sidekick-vpc-${process.env.STAGE}`, {
-      vpcName: `sidekick-vpc-${process.env.STAGE}`,
+    this.defaultVPC = ec2.Vpc.fromLookup(this, `lookup-default-vpc-${process.env.STAGE}`, {
+      isDefault: true
     });
 
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-    // Get Sidekick Zone
+    // Create Sidekick Api Security Group
 
-    this.sidekickZone = route53.HostedZone.fromLookup(this,`sidekick-zone-${process.env.STAGE}`, {
-      domainName: `${process.env.DOMAIN_NAME}`
-    });
-
-    ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-    // Create Sidekick Sandbox Todo Java Security Group
-
-    this.sidekickSandboxTodoJavaSecurityGroupName = `sidekick-sandbox-todo-java-sg-${process.env.STAGE}`;
-    this.sidekickSandboxTodoJavaSecurityGroup = new ec2.SecurityGroup(this, this.sidekickSandboxTodoJavaSecurityGroupName, {
-      securityGroupName: this.sidekickSandboxTodoJavaSecurityGroupName,
-      description: `Sidekick Sandbox Todo Java Security Group for ${process.env.STAGE} environment`,
-      vpc: this.sidekickVPC,
+    this.sidekickSandboxSecurityGroupName = `sidekick-sandbox-sg-${process.env.STAGE}`;
+    this.sidekickSandboxSecurityGroup = new ec2.SecurityGroup(this, this.sidekickSandboxSecurityGroupName, {
+      securityGroupName: this.sidekickSandboxSecurityGroupName,
+      description: `Sidekick Sandbox Security Group for ${process.env.STAGE} environment`,
+      vpc: this.defaultVPC,
       allowAllOutbound: true,
     });
 
@@ -74,26 +62,26 @@ export class SetupStack extends cdk.NestedStack {
 
     const sidekickSandboxELBSecurityGroup = ec2.SecurityGroup.fromSecurityGroupId(this, `lookup-sidekick-sandbox-elb-sg-${process.env.STAGE}`, this.sidekickSandboxELBSecurityGroupId);
 
-    this.sidekickSandboxTodoJavaSecurityGroup.connections.allowFrom(sidekickSandboxELBSecurityGroup, ec2.Port.tcp(8080), 'Ingress HTTP connection from ELB');
-    new cdk.CfnOutput(this, `sidekick-sandbox-todo-java-sg-id-${process.env.STAGE}`, {
-      value: this.sidekickSandboxTodoJavaSecurityGroup.securityGroupId,
-      exportName: `sidekick-sandbox-todo-java-sg-id-${process.env.STAGE}`,
+    this.sidekickSandboxSecurityGroup.connections.allowFrom(sidekickSandboxELBSecurityGroup, ec2.Port.tcp(8080), 'Ingress HTTP connection from ELB');
+    new cdk.CfnOutput(this, `sidekick-sandbox-sg-id-${process.env.STAGE}`, {
+      value: this.sidekickSandboxSecurityGroup.securityGroupId,
+      exportName: `sidekick-sandbox-sg-id-${process.env.STAGE}`,
     });
 
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-    // Create Sidekick Sandbox Todo Java Role and Instance Profile
+    // Create Sidekick Api Role and Instance Profile
 
-    this.sidekickSandboxTodoJavaRoleName = `sidekick-sandbox-todo-java-role-${process.env.STAGE}`;
-    this.sidekickSandboxTodoJavaRole = new iam.Role(this, this.sidekickSandboxTodoJavaRoleName, {
-      roleName: this.sidekickSandboxTodoJavaRoleName,
-      description: `Sidekick Sandbox Todo Java Role for ${process.env.STAGE} environment`,
+    this.sidekickSandboxRoleName = `sidekick-sandbox-role-${process.env.STAGE}`;
+    this.sidekickSandboxRole = new iam.Role(this, this.sidekickSandboxRoleName, {
+      roleName: this.sidekickSandboxRoleName,
+      description: `Sidekick Api Role for ${process.env.STAGE} environment`,
       assumedBy: new iam.ServicePrincipal('ec2.amazonaws.com'),
     });
 
-    this.sidekickSandboxTodoJavaPolicyName = `sidekick-sandbox-todo-java-policy-${process.env.STAGE}`;
-    this.sidekickSandboxTodoJavaPolicy = new iam.ManagedPolicy(this, this.sidekickSandboxTodoJavaPolicyName, {
-      managedPolicyName: this.sidekickSandboxTodoJavaPolicyName,
+    this.sidekickSandboxPolicyName = `sidekick-sandbox-policy-${process.env.STAGE}`;
+    this.sidekickSandboxPolicy = new iam.ManagedPolicy(this, this.sidekickSandboxPolicyName, {
+      managedPolicyName: this.sidekickSandboxPolicyName,
       statements: [
         new iam.PolicyStatement({
           effect: iam.Effect.ALLOW,
@@ -101,7 +89,7 @@ export class SetupStack extends cdk.NestedStack {
             'elasticbeanstalk:PutInstanceStatistics',
           ],
           resources: [
-            `arn:aws:elasticbeanstalk:*:*:environment/sidekick-sandbox-todo-java-${process.env.STAGE}*`
+            `arn:aws:elasticbeanstalk:*:*:environment/sidekick-sandbox-${process.env.STAGE}*`
           ],
         }),
         new iam.PolicyStatement({
@@ -111,38 +99,28 @@ export class SetupStack extends cdk.NestedStack {
             'logs:PutLogEvents',
           ],
           resources: [
-            `arn:aws:logs:*:*:log-group:/aws/elasticbeanstalk/sidekick-sandbox-todo-java-${process.env.STAGE}*`,
-          ],
-        }),
-        new iam.PolicyStatement({
-          effect: iam.Effect.ALLOW,
-          actions: [
-            's3:Get*',
-            's3:List*',
-          ],
-          resources: [
-            `arn:aws:s3:::sidekick-releases-${process.env.STAGE}/agents/*`
+            `arn:aws:logs:*:*:log-group:/aws/elasticbeanstalk/sidekick-sandbox-${process.env.STAGE}*`,
           ],
         }),
       ],
     });
-    new cdk.CfnOutput(this, `sidekick-sandbox-todo-java-role-arn-${process.env.STAGE}`, {
-      value: this.sidekickSandboxTodoJavaRole.roleArn,
-      exportName: `sidekick-sandbox-todo-java-role-arn-${process.env.STAGE}`,
+    new cdk.CfnOutput(this, `sidekick-sandbox-role-arn-${process.env.STAGE}`, {
+      value: this.sidekickSandboxRole.roleArn,
+      exportName: `sidekick-sandbox-role-arn-${process.env.STAGE}`,
     });
 
-    this.sidekickSandboxTodoJavaRole.addManagedPolicy(this.sidekickSandboxTodoJavaPolicy);
-    this.sidekickSandboxTodoJavaRole.addManagedPolicy(iam.ManagedPolicy.fromAwsManagedPolicyName('AmazonSSMManagedInstanceCore'))
+    this.sidekickSandboxRole.addManagedPolicy(this.sidekickSandboxPolicy);
+    this.sidekickSandboxRole.addManagedPolicy(iam.ManagedPolicy.fromAwsManagedPolicyName('AmazonSSMManagedInstanceCore'))
 
-    this.sidekickSandboxTodoJavaInstanceProfileName = `sidekick-sandbox-todo-java-role-${process.env.STAGE}`;
-    this.sidekickSandboxTodoJavaInstanceProfile = new iam.CfnInstanceProfile(this, `sidekick-sandbox-todo-java-instance-profile-${process.env.STAGE}`, {
-      instanceProfileName: this.sidekickSandboxTodoJavaInstanceProfileName,
+    this.sidekickSandboxInstanceProfileName = `sidekick-sandbox-role-${process.env.STAGE}`;
+    this.sidekickSandboxInstanceProfile = new iam.CfnInstanceProfile(this, `sidekick-sandbox-instance-profile-${process.env.STAGE}`, {
+      instanceProfileName: this.sidekickSandboxInstanceProfileName,
       path: '/',
-      roles: [this.sidekickSandboxTodoJavaRole.roleName]
+      roles: [this.sidekickSandboxRole.roleName]
     });
-    new cdk.CfnOutput(this, `sidekick-sandbox-todo-java-instance-profile-arn-${process.env.STAGE}`, {
-      value: this.sidekickSandboxTodoJavaInstanceProfile.attrArn,
-      exportName: `sidekick-sandbox-todo-java-instance-profile-arn-${process.env.STAGE}`,
+    new cdk.CfnOutput(this, `sidekick-sandbox-instance-profile-arn-${process.env.STAGE}`, {
+      value: this.sidekickSandboxInstanceProfile.attrArn,
+      exportName: `sidekick-sandbox-instance-profile-arn-${process.env.STAGE}`,
     });
 
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -150,16 +128,16 @@ export class SetupStack extends cdk.NestedStack {
     // Create Sidekick Sandbox Todo Java EB Application
 
     this.sidekickSandboxTodoJavaEBAppName = 'sidekick-sandbox-todo-java';
-    const sidekickSandboxTodoJavaEBAppDescription = `Sidekick Sandbox Todo Java App (owned by CF Stack ${this.logicalStackName}`;
+    const sidekickSandboxTodoJavaEBAppDescription = `Sidekick Sandbox Todo Java (owned by CF Stack ${this.logicalStackName}`;
     const describeApplicationsResponse = await ebClient.describeApplications({
       ApplicationNames: [this.sidekickSandboxTodoJavaEBAppName]
     }).promise();
-    const existingSidekickSandboxTodoJavaEBApp = describeApplicationsResponse.Applications.find((appDesc: ApplicationDescription) => {
+    const existingSidekickTodoJavaEBApp = describeApplicationsResponse.Applications.find((appDesc: ApplicationDescription) => {
       return appDesc.ApplicationName === this.sidekickSandboxTodoJavaEBAppName;
     });
 
     /*
-     * SidekickSandboxTodoJava ElasticBeanstalk application should be owned by this stack
+     * Sidekick Sandbox Todo Java ElasticBeanstalk application should be owned by this stack
      * - if it is not exist
      * - or if it is exist and created by this stack
      *
@@ -169,10 +147,10 @@ export class SetupStack extends cdk.NestedStack {
      * are not supported over CloudFormation but API/AWS SDK
      */
 
-    const ownSidekickSandboxTodoJavaEBApp: boolean =
-      !existingSidekickSandboxTodoJavaEBApp ||
-      (existingSidekickSandboxTodoJavaEBApp && existingSidekickSandboxTodoJavaEBApp.Description === sidekickSandboxTodoJavaEBAppDescription);
-    if (ownSidekickSandboxTodoJavaEBApp) {
+    const ownSidekickApiEBApp: boolean =
+        !existingSidekickTodoJavaEBApp ||
+        (existingSidekickTodoJavaEBApp && existingSidekickTodoJavaEBApp.Description === sidekickSandboxTodoJavaEBAppDescription);
+    if (ownSidekickApiEBApp) {
       this.sidekickSandboxTodoJavaEBApp = new eb.CfnApplication(this, this.sidekickSandboxTodoJavaEBAppName, {
         applicationName: this.sidekickSandboxTodoJavaEBAppName,
         description: sidekickSandboxTodoJavaEBAppDescription,
