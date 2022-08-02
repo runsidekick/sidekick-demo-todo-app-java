@@ -7,12 +7,12 @@
   {
     "namespace": "aws:ec2:vpc",
     "optionName": "ELBSubnets",
-    "value": "${sidekickVPCPublicSubnets}"
+    "value": "${sidekickSandboxVPCPublicSubnets}"
   },
   {
     "namespace": "aws:ec2:vpc",
     "optionName": "Subnets",
-    "value": "${sidekickVPCPrivateSubnets}"
+    "value": "${sidekickSandboxVPCPrivateSubnets}"
   },
   {
     "namespace": "aws:autoscaling:asg",
@@ -27,12 +27,12 @@
   {
     "namespace": "aws:autoscaling:launchconfiguration",
     "optionName": "IamInstanceProfile",
-    "value": "${sidekickSandboxTodoJavaInstanceProfileName}"
+    "value": "${sidekickSandboxInstanceProfileName}"
   },
   {
     "namespace": "aws:autoscaling:launchconfiguration",
     "optionName": "SecurityGroups",
-    "value": "${sidekickSandboxTodoJavaSecurityGroupId}"
+    "value": "${sidekickSandboxSecurityGroupId}"
   },
   {
     "namespace": "aws:autoscaling:launchconfiguration",

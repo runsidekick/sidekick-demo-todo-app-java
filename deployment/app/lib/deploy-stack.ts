@@ -2,8 +2,6 @@ import * as cdk from 'aws-cdk-lib';
 import * as eb from 'aws-cdk-lib/aws-elasticbeanstalk';
 import * as ec2 from 'aws-cdk-lib/aws-ec2';
 import * as elbv2 from 'aws-cdk-lib/aws-elasticloadbalancingv2';
-import * as route53 from 'aws-cdk-lib/aws-route53';
-import * as alias from 'aws-cdk-lib/aws-route53-targets';
 import { SetupStack } from './setup-stack';
 import { Construct } from 'constructs';
 
@@ -16,6 +14,9 @@ export class DeployStack extends cdk.NestedStack {
   sidekickSandboxTodoJavaEBEnvironment: eb.CfnEnvironment;
 
   sidekickSandboxELBArn: string
+
+  sidekickDatabaseAccessMarkerSecurityGroup: ec2.ISecurityGroup;
+  sidekickCacheAccessMarkerSecurityGroup: ec2.ISecurityGroup;
 
   constructor(scope: Construct, id: string, setupStack: SetupStack, props?: cdk.NestedStackProps) {
     super(scope, id, props);
@@ -40,27 +41,42 @@ export class DeployStack extends cdk.NestedStack {
 
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
+    // Lookup Sidekick Security Groups
+    this.sidekickDatabaseAccessMarkerSecurityGroup = ec2.SecurityGroup.fromLookupByName(
+        this,
+        `lookup-sidekick-db-access-marker-sg-${process.env.STAGE}`,
+        `sidekick-db-access-marker-sg-${process.env.STAGE}`,
+        setupStack.sidekickSandboxVPC);
+
+    this.sidekickCacheAccessMarkerSecurityGroup = ec2.SecurityGroup.fromLookupByName(
+        this,
+        `lookup-sidekick-cache-access-marker-sg-${process.env.STAGE}`,
+        `sidekick-cache-access-marker-sg-${process.env.STAGE}`,
+        setupStack.sidekickSandboxVPC);
+
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
     // Create Sidekick Sandbox Todo Java EB Configuration Template
 
     // Get properties from setup stack as local variable to be able to bind them into loaded option settings
-    const sidekickVPCId = setupStack.sidekickVPC.vpcId;
-    const sidekickVPCPublicSubnets = setupStack.sidekickVPC.publicSubnets.map((value: any) => value.subnetId).join(',');
-    const sidekickVPCPrivateSubnets = setupStack.sidekickVPC.privateSubnets.map((value: any) => value.subnetId).join(',');
-    const sidekickSandboxTodoJavaInstanceProfileName = setupStack.sidekickSandboxTodoJavaInstanceProfileName;
-    const sidekickSandboxTodoJavaSecurityGroupId = setupStack.sidekickSandboxTodoJavaSecurityGroup.securityGroupId;
+    const sidekickSandboxVPCId = setupStack.defaultVPC.vpcId;
+    const sidekickSandboxVPCPublicSubnets = setupStack.defaultVPC.publicSubnets.map((value: any) => value.subnetId).join(',');
+    const sidekickSandboxVPCPrivateSubnets = setupStack.defaultVPC.privateSubnets.map((value: any) => value.subnetId).join(',');
+    const sidekickDatabaseAccessMarkerSecurityGroupId = this.sidekickDatabaseAccessMarkerSecurityGroup.securityGroupId;
+    const sidekickCacheAccessMarkerSecurityGroupId = this.sidekickCacheAccessMarkerSecurityGroup.securityGroupId;
+    const sidekickSandboxInstanceProfileName = setupStack.sidekickSandboxInstanceProfileName;
+    const sidekickSandboxSecurityGroupId = setupStack.sidekickSandboxSecurityGroup.securityGroupId;
     const sidekickSandboxELBSecurityGroupId = setupStack.sidekickSandboxELBSecurityGroupId;
 
     this.sidekickSandboxELBArn = cdk.Fn.importValue(`sidekick-sandbox-elb-arn-${process.env.STAGE}`);
 
     const sidekickSandboxELB: elbv2.IApplicationLoadBalancer = elbv2.ApplicationLoadBalancer.fromApplicationLoadBalancerAttributes(this,
-      `lookup-sidekick-sandbox-elb-${process.env.STAGE}`,
-      {
-        loadBalancerArn: this.sidekickSandboxELBArn.toString(),
-        securityGroupId: sidekickSandboxELBSecurityGroupId,
-        vpc: setupStack.sidekickVPC
-      }
+        `lookup-sidekick-sandbox-elb-${process.env.STAGE}`,
+        {
+          loadBalancerArn: this.sidekickSandboxELBArn.toString(),
+          securityGroupId: sidekickSandboxELBSecurityGroupId,
+          vpc: setupStack.defaultVPC
+        }
     );
 
     const rawOptionSettings = fs.readFileSync('../eb-option-settings.json', 'utf8');
@@ -73,8 +89,8 @@ export class DeployStack extends cdk.NestedStack {
       optionSettings: sidekickSandboxTodoJavaEBOptionSettings,
     });
 
-    this.sidekickSandboxTodoJavaEBConfigurationTemplate.node.addDependency(setupStack.sidekickSandboxTodoJavaInstanceProfile);
-    this.sidekickSandboxTodoJavaEBConfigurationTemplate.node.addDependency(setupStack.sidekickSandboxTodoJavaSecurityGroup);
+    this.sidekickSandboxTodoJavaEBConfigurationTemplate.node.addDependency(setupStack.sidekickSandboxInstanceProfile);
+    this.sidekickSandboxTodoJavaEBConfigurationTemplate.node.addDependency(setupStack.sidekickSandboxSecurityGroup);
     this.sidekickSandboxTodoJavaEBConfigurationTemplate.node.addDependency(sidekickSandboxELB);
 
     new cdk.CfnOutput(this, `sidekick-sandbox-todo-java-eb-config-template-name-${process.env.STAGE}`, {
@@ -100,17 +116,6 @@ export class DeployStack extends cdk.NestedStack {
     new cdk.CfnOutput(this, `sidekick-sandbox-todo-java-eb-environment-name-${process.env.STAGE}`, {
       value: setupStack.sidekickSandboxTodoJavaEBEnvironmentName,
       exportName: `sidekick-sandbox-todo-java-eb-environment-name-${process.env.STAGE}`,
-    });
-
-
-    ////////////////////////////////////////////////////////////////////////////////////////////////////
-    //
-    // Route53 A Record Redirect
-    //
-    new route53.ARecord(this,`sidekick-sandbox-elb-dns-a-record-${process.env.STAGE}`, {
-      zone: setupStack.sidekickZone,
-      recordName: `*.${process.env.SANDBOX_SUBDOMAIN_NAME}`,
-      target: route53.RecordTarget.fromAlias(new alias.LoadBalancerTarget(sidekickSandboxELB))
     });
   }
 }
