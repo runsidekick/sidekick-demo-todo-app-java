@@ -2,7 +2,7 @@
   {
     "namespace": "aws:ec2:vpc",
     "optionName": "VPCId",
-    "value": "${sidekickVPCId}"
+    "value": "${sidekickSandboxVPCId}"
   },
   {
     "namespace": "aws:ec2:vpc",
