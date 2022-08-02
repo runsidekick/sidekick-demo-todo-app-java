@@ -18,7 +18,7 @@ const props = {
     },
 };
 
-const mainStack = new Stack(app, `sidekick-sandbox-stack-${process.env.STAGE}`, props);
+const mainStack = new Stack(app, `sidekick-sandbox-setup-stack-${process.env.STAGE}`, props);
 
 ////////////////////////////////////////////////////////////////////////////////
 //

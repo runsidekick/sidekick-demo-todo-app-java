@@ -8,7 +8,7 @@ import { Construct } from 'constructs';
 
 export class SandboxELBStack extends cdk.NestedStack {
 
-  defaultVPC: ec2.IVpc;
+  sidekickVPC: ec2.IVpc;
 
   sidekickSandboxZone: route53.IHostedZone;
   sidekickSandboxCertificate: acm.DnsValidatedCertificate;
@@ -25,8 +25,8 @@ export class SandboxELBStack extends cdk.NestedStack {
     //
     // VPC
     //
-    this.defaultVPC = ec2.Vpc.fromLookup(this, `lookup-default-vpc-${process.env.STAGE}`, {
-      isDefault: true
+    this.sidekickVPC = ec2.Vpc.fromLookup(this, `lookup-sidekick-vpc-${process.env.STAGE}`, {
+      vpcName: `sidekick-vpc-${process.env.STAGE}`,
     });
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -38,8 +38,8 @@ export class SandboxELBStack extends cdk.NestedStack {
     });
 
     this.sidekickSandboxCertificate = new acm.DnsValidatedCertificate(this, `sidekick-sandbox-certificate-${process.env.STAGE}`, {
-      domainName: `${process.env.SERVICE_SUBDOMAIN_NAME}.${process.env.DOMAIN_NAME}`,
-      subjectAlternativeNames: [`*.${process.env.SERVICE_SUBDOMAIN_NAME}.${process.env.DOMAIN_NAME}`],
+      domainName: `${process.env.SANDBOX_SUBDOMAIN_NAME}.${process.env.DOMAIN_NAME}`,
+      subjectAlternativeNames: [`*.${process.env.SANDBOX_SUBDOMAIN_NAME}.${process.env.DOMAIN_NAME}`],
       hostedZone: this.sidekickSandboxZone,
       region: this.region
     });
@@ -55,8 +55,8 @@ export class SandboxELBStack extends cdk.NestedStack {
     //
     this.sidekickSandboxELBSecurityGroup = new ec2.SecurityGroup(this, `sidekick-sandbox-elb-sg-${process.env.STAGE}`, {
       securityGroupName: `sidekick-sandbox-elb-sg-${process.env.STAGE}`,
-      description: `Sidekick Service ELB Security Group for ${process.env.STAGE} environment`,
-      vpc: this.defaultVPC,
+      description: `Sidekick Sandbox ELB Security Group for ${process.env.STAGE} environment`,
+      vpc: this.sidekickVPC,
       allowAllOutbound: true,
     });
 
@@ -73,9 +73,9 @@ export class SandboxELBStack extends cdk.NestedStack {
     //
     this.sidekickSandboxELB = new elbv2.ApplicationLoadBalancer(this, `sidekick-sandbox-elb-${process.env.STAGE}`, {
       loadBalancerName: `sidekick-sandbox-elb-${process.env.STAGE}`,
-      vpc: this.defaultVPC,
+      vpc: this.sidekickVPC,
       securityGroup: this.sidekickSandboxELBSecurityGroup,
-      vpcSubnets: this.defaultVPC.selectSubnets({ onePerAz: true, subnetType: ec2.SubnetType.PUBLIC }),
+      vpcSubnets: this.sidekickVPC.selectSubnets({ onePerAz: true, subnetType: ec2.SubnetType.PUBLIC }),
       internetFacing: true,
       idleTimeout: cdk.Duration.minutes(5),
     });
