@@ -89,7 +89,7 @@ export class SetupStack extends cdk.NestedStack {
             'elasticbeanstalk:PutInstanceStatistics',
           ],
           resources: [
-            `arn:aws:elasticbeanstalk:*:*:environment/sidekick-sandbox-${process.env.STAGE}*`
+            `arn:aws:elasticbeanstalk:*:*:environment/sidekick-sandbox-todo-java-${process.env.STAGE}*`
           ],
         }),
         new iam.PolicyStatement({
@@ -99,7 +99,17 @@ export class SetupStack extends cdk.NestedStack {
             'logs:PutLogEvents',
           ],
           resources: [
-            `arn:aws:logs:*:*:log-group:/aws/elasticbeanstalk/sidekick-sandbox-${process.env.STAGE}*`,
+            `arn:aws:logs:*:*:log-group:/aws/elasticbeanstalk/sidekick-sandbox-todo-java-${process.env.STAGE}*`,
+          ],
+        }),
+        new iam.PolicyStatement({
+          effect: iam.Effect.ALLOW,
+          actions: [
+            's3:Get*',
+            's3:List*',
+          ],
+          resources: [
+            `arn:aws:s3:::sidekick-releases-${process.env.STAGE}/agents/*`
           ],
         }),
       ],
@@ -128,11 +138,11 @@ export class SetupStack extends cdk.NestedStack {
     // Create Sidekick Sandbox Todo Java EB Application
 
     this.sidekickSandboxTodoJavaEBAppName = 'sidekick-sandbox-todo-java';
-    const sidekickSandboxTodoJavaEBAppDescription = `Sidekick Sandbox Todo Java (owned by CF Stack ${this.logicalStackName}`;
+    const sidekickSandboxTodoJavaEBAppDescription = `Sidekick Sandbox Todo Java App (owned by CF Stack ${this.logicalStackName}`;
     const describeApplicationsResponse = await ebClient.describeApplications({
       ApplicationNames: [this.sidekickSandboxTodoJavaEBAppName]
     }).promise();
-    const existingSidekickTodoJavaEBApp = describeApplicationsResponse.Applications.find((appDesc: ApplicationDescription) => {
+    const existingSidekickSandboxTodoJavaEBApp = describeApplicationsResponse.Applications.find((appDesc: ApplicationDescription) => {
       return appDesc.ApplicationName === this.sidekickSandboxTodoJavaEBAppName;
     });
 
@@ -147,10 +157,10 @@ export class SetupStack extends cdk.NestedStack {
      * are not supported over CloudFormation but API/AWS SDK
      */
 
-    const ownSidekickApiEBApp: boolean =
-        !existingSidekickTodoJavaEBApp ||
-        (existingSidekickTodoJavaEBApp && existingSidekickTodoJavaEBApp.Description === sidekickSandboxTodoJavaEBAppDescription);
-    if (ownSidekickApiEBApp) {
+    const ownSidekickSandboxTodoJavaEBApp: boolean =
+        !existingSidekickSandboxTodoJavaEBApp ||
+        (existingSidekickSandboxTodoJavaEBApp && existingSidekickSandboxTodoJavaEBApp.Description === sidekickSandboxTodoJavaEBAppDescription);
+    if (ownSidekickSandboxTodoJavaEBApp) {
       this.sidekickSandboxTodoJavaEBApp = new eb.CfnApplication(this, this.sidekickSandboxTodoJavaEBAppName, {
         applicationName: this.sidekickSandboxTodoJavaEBAppName,
         description: sidekickSandboxTodoJavaEBAppDescription,
