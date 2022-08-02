@@ -109,7 +109,7 @@ export class SetupStack extends cdk.NestedStack {
             's3:List*',
           ],
           resources: [
-            `arn:aws:s3:::sidekick-releases-${process.env.STAGE}/agents/*`
+            `arn:aws:s3:::sidekick-todo-app-${process.env.STAGE}/*`
           ],
         }),
       ],
