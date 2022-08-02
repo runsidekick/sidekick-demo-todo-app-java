@@ -10,7 +10,7 @@ interface ELBStackProps extends cdk.NestedStackProps {
   vpc: ec2.IVpc
 }
 
-export class SandboxElbStack extends cdk.NestedStack {
+export class SandboxELBStack extends cdk.NestedStack {
 
   defaultVPC: ec2.IVpc;
 
