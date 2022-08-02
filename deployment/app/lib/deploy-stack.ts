@@ -59,9 +59,9 @@ export class DeployStack extends cdk.NestedStack {
     // Create Sidekick Sandbox Todo Java EB Configuration Template
 
     // Get properties from setup stack as local variable to be able to bind them into loaded option settings
-    const sidekickSandboxVPCId = setupStack.defaultVPC.vpcId;
-    const sidekickSandboxVPCPublicSubnets = setupStack.defaultVPC.publicSubnets.map((value: any) => value.subnetId).join(',');
-    const sidekickSandboxVPCPrivateSubnets = setupStack.defaultVPC.privateSubnets.map((value: any) => value.subnetId).join(',');
+    const sidekickSandboxVPCId = setupStack.sidekickVPC.vpcId;
+    const sidekickSandboxVPCPublicSubnets = setupStack.sidekickVPC.publicSubnets.map((value: any) => value.subnetId).join(',');
+    const sidekickSandboxVPCPrivateSubnets = setupStack.sidekickVPC.privateSubnets.map((value: any) => value.subnetId).join(',');
     const sidekickDatabaseAccessMarkerSecurityGroupId = this.sidekickDatabaseAccessMarkerSecurityGroup.securityGroupId;
     const sidekickCacheAccessMarkerSecurityGroupId = this.sidekickCacheAccessMarkerSecurityGroup.securityGroupId;
     const sidekickSandboxInstanceProfileName = setupStack.sidekickSandboxInstanceProfileName;
@@ -75,7 +75,7 @@ export class DeployStack extends cdk.NestedStack {
         {
           loadBalancerArn: this.sidekickSandboxELBArn.toString(),
           securityGroupId: sidekickSandboxELBSecurityGroupId,
-          vpc: setupStack.defaultVPC
+          vpc: setupStack.sidekickVPC
         }
     );
 
