@@ -2,6 +2,7 @@ import * as cdk from 'aws-cdk-lib';
 import * as ec2 from 'aws-cdk-lib/aws-ec2';
 import * as route53 from 'aws-cdk-lib/aws-route53';
 import * as alias from 'aws-cdk-lib/aws-route53-targets';
+import * as ssm from 'aws-cdk-lib/aws-ssm';
 import * as acm from 'aws-cdk-lib/aws-certificatemanager';
 import * as elbv2 from 'aws-cdk-lib/aws-elasticloadbalancingv2';
 import { Construct } from 'constructs';
@@ -104,6 +105,25 @@ export class SandboxELBStack extends cdk.NestedStack {
       certificates: [
         this.sidekickSandboxCertificate
       ],
+    });
+
+    ////////////////////////////////////////////////////////////////////////////////////////////////////
+    //
+    // SSM Exports
+    //
+    new ssm.StringParameter(this, `sidekick-sandbox-elb-listener-ssm-${process.env.STAGE}`, {
+      parameterName: `/sidekick/${process.env.STAGE}/common/infra/sandbox.elb.listener.arn`,
+      stringValue: this.sidekickSandboxELBListener.listenerArn.toString(),
+    })
+
+    new cdk.CfnOutput(this, `sidekick-sandbox-elb-arn-${process.env.STAGE}`, {
+      value: this.sidekickSandboxELB.loadBalancerArn,
+      exportName: `sidekick-sandbox-elb-arn-${process.env.STAGE}`,
+    });
+
+    new cdk.CfnOutput(this, `sidekick-sandbox-elb-dns-${process.env.STAGE}`, {
+      value: this.sidekickSandboxELB.loadBalancerDnsName,
+      exportName: `sidekick-sandbox-elb-dns-${process.env.STAGE}`,
     });
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////
