@@ -1,0 +1,162 @@
+[
+  {
+    "namespace": "aws:ec2:vpc",
+    "optionName": "VPCId",
+    "value": "${sidekickSandboxVPCId}"
+  },
+  {
+    "namespace": "aws:ec2:vpc",
+    "optionName": "ELBSubnets",
+    "value": "${sidekickSandboxVPCPublicSubnets}"
+  },
+  {
+    "namespace": "aws:ec2:vpc",
+    "optionName": "Subnets",
+    "value": "${sidekickSandboxVPCPrivateSubnets}"
+  },
+  {
+    "namespace": "aws:autoscaling:asg",
+    "optionName": "MinSize",
+    "value": "1"
+  },
+  {
+    "namespace": "aws:autoscaling:asg",
+    "optionName": "MaxSize",
+    "value": "1"
+  },
+  {
+    "namespace": "aws:autoscaling:launchconfiguration",
+    "optionName": "IamInstanceProfile",
+    "value": "${sidekickSandboxInstanceProfileName}"
+  },
+  {
+    "namespace": "aws:autoscaling:launchconfiguration",
+    "optionName": "SecurityGroups",
+    "value": "${sidekickSandboxSecurityGroupId}"
+  },
+  {
+    "namespace": "aws:autoscaling:launchconfiguration",
+    "optionName": "InstanceType",
+    "value": "${process.env.SANDBOX_APP_INSTANCE_TYPE}"
+  },
+  {
+    "namespace": "aws:elasticbeanstalk:environment",
+    "optionName": "LoadBalancerType",
+    "value": "application"
+  },
+  {
+    "namespace": "aws:elasticbeanstalk:environment",
+    "optionName": "LoadBalancerIsShared",
+    "value": "true"
+  },
+  {
+    "namespace": "aws:elbv2:loadbalancer",
+    "optionName": "SharedLoadBalancer",
+    "value": "${sidekickSandboxELB.loadBalancerArn}"
+  },
+  {
+    "namespace": "aws:elbv2:loadbalancer",
+    "optionName": "ManagedSecurityGroup",
+    "value": "${sidekickSandboxELBSecurityGroupId}"
+  },
+  {
+    "namespace": "aws:elbv2:loadbalancer",
+    "optionName": "SecurityGroups",
+    "value": "${sidekickSandboxELBSecurityGroupId}"
+  },
+  {
+    "namespace": "aws:elbv2:listener:443",
+    "optionName": "Rules",
+    "value": "https"
+  },
+  {
+    "namespace": "aws:elbv2:listenerrule:https",
+    "optionName": "HostHeaders",
+    "value": "${process.env.SANDBOX_APP_DOMAIN_NAME},*.${process.env.SANDBOX_APP_DOMAIN_NAME}"
+  },
+  {
+    "namespace": "aws:elbv2:listenerrule:https",
+    "optionName": "PathPatterns",
+    "value": "/*"
+  },
+  {
+    "namespace": "aws:elbv2:listenerrule:https",
+    "optionName": "Priority",
+    "value": "1"
+  },
+  {
+    "namespace": "aws:elbv2:listenerrule:https",
+    "optionName": "Process",
+    "value": "default"
+  },
+  {
+    "namespace": "aws:elasticbeanstalk:environment:process:default",
+    "optionName": "Protocol",
+    "value": "HTTP"
+  },
+  {
+    "namespace": "aws:elasticbeanstalk:environment:process:default",
+    "optionName": "Port",
+    "value": "8080"
+  },
+  {
+    "namespace": "aws:elasticbeanstalk:environment:process:default",
+    "optionName": "HealthCheckPath",
+    "value": "/"
+  },
+  {
+    "namespace": "aws:elasticbeanstalk:environment:process:default",
+    "optionName": "DeregistrationDelay",
+    "value": "300"
+  },
+  {
+    "namespace": "aws:elasticbeanstalk:environment:process:default",
+    "optionName": "HealthCheckInterval",
+    "value": "300"
+  },
+  {
+    "namespace": "aws:elasticbeanstalk:environment:process:default",
+    "optionName": "StickinessEnabled",
+    "value": "true"
+  },
+  {
+    "namespace": "aws:elasticbeanstalk:healthreporting:system",
+    "optionName": "SystemType",
+    "value": "enhanced"
+  },
+  {
+    "namespace": "aws:elasticbeanstalk:command",
+    "optionName": "DeploymentPolicy",
+    "value": "${process.env.SANDBOX_APP_DEPLOYMENT_POLICY}"
+  },
+  {
+    "namespace": "aws:autoscaling:updatepolicy:rollingupdate",
+    "optionName": "RollingUpdateEnabled",
+    "value": "${process.env.SANDBOX_APP_ROLLING_UPDATE_ENABLED}"
+  },
+  {
+    "namespace": "aws:autoscaling:updatepolicy:rollingupdate",
+    "optionName": "MaxBatchSize",
+    "value": "1"
+  },
+  {
+    "namespace": "aws:autoscaling:updatepolicy:rollingupdate",
+    "optionName": "MinInstancesInService",
+    "value": "1"
+  },
+  {
+    "namespace": "aws:autoscaling:updatepolicy:rollingupdate",
+    "optionName": "RollingUpdateType",
+    "value": "Immutable"
+  },
+  {
+    "namespace": "aws:elasticbeanstalk:cloudwatch:logs",
+    "optionName": "StreamLogs",
+    "value": "true"
+  },
+  {
+    "namespace": "aws:elasticbeanstalk:healthreporting:system",
+    "optionName": "EnhancedHealthAuthEnabled",
+    "value": "false"
+  }
+]

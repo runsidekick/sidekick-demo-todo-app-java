@@ -1,0 +1,11 @@
+sidekick:
+  apiKey: dceec4b5-90ac-438c-bc81-c7fe1b0b8ed2
+  agent:
+    broker:
+      host: wss://broker.service.runsidekick.me
+    log:
+      level: debug
+    application:
+      name: sidekick-demo-todo-app-java
+      stage: onboarding
+      version: 1.0.0

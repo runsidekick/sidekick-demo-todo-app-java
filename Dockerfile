@@ -1,6 +1,6 @@
 FROM openjdk:8
 RUN mkdir -p /app
-COPY target/sidekick-demo-todo-app-java-1.0.0.jar /app/sidekick-demo-todo-app-java.jar
+COPY target/sidekick-demo-todo-app-java.jar /app/sidekick-demo-todo-app-java.jar
 COPY sidekick-agent-bootstrap.jar /app/sidekick-agent-bootstrap.jar
 WORKDIR /app
 EXPOSE 8080

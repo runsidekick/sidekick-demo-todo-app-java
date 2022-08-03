@@ -1,0 +1,1 @@
+web: java -jar -Xms768m -Xmx768m -javaagent:/var/app/sidekick-agent-bootstrap.jar -Dsidekick.agent.broker.host=wss://broker.service.runsidekick.com sidekick-demo-todo-app-java.jar
