@@ -1,8 +1,8 @@
 sidekick:
-  apiKey: dceec4b5-90ac-438c-bc81-c7fe1b0b8ed2
+  apiKey: <YOUR-API-KEY>
   agent:
     broker:
-      host: wss://broker.service.runsidekick.me
+      host: wss://broker.service.runsidekick.com
     log:
       level: debug
     application:
