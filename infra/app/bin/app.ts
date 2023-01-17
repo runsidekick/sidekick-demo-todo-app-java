@@ -25,7 +25,7 @@ const mainStack = new Stack(app, `sidekick-sandbox-setup-stack-${process.env.STA
 //
 // ELB Stack
 //
-new SandboxELBStack(mainStack, `sidekick-sandbox-elb-stack-${process.env.STAGE}`, {});
+new SandboxELBStack(mainStack, `sidekick-sandbox-elb-stack-${process.env.STAGE}`);
 
 ////////////////////////////////////////////////////////////////////////////////
 //
