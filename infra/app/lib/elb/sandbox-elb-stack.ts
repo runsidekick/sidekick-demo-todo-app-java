@@ -19,7 +19,7 @@ export class SandboxELBStack extends cdk.NestedStack {
 
   sidekickSandboxELBSecurityGroup: ec2.SecurityGroup;
 
-  constructor(scope: Construct, id: string, props: cdk.NestedStackProps) {
+  constructor(scope: Construct, id: string, props?: cdk.NestedStackProps) {
     super(scope, id, props);
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////
