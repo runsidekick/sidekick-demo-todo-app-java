@@ -15,6 +15,8 @@ export class S3BucketsStack extends cdk.NestedStack {
             bucketName: `sidekick-todo-app-${process.env.STAGE}`,
             removalPolicy: cdk.RemovalPolicy.DESTROY,
             autoDeleteObjects: true,
+            publicReadAccess: false,
+            blockPublicAccess: s3.BlockPublicAccess.BLOCK_ALL
         });
     }
 }
