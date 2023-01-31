@@ -99,6 +99,11 @@
             <artifactId>browserstack-local-java</artifactId>
             <version>1.0.3</version>
         </dependency>
+        <dependency>
+            <groupId>com.runsidekick.agent</groupId>
+            <artifactId>sidekick-agent-api-data-redaction</artifactId>
+            <version>0.0.15</version>
+        </dependency>
 
     </dependencies>
 
